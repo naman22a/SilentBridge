@@ -1,11 +1,14 @@
 import React from 'react';
 import { Stack } from 'expo-router';
+import { PaperProvider } from 'react-native-paper';
 
 const RootLayout = () => {
     return (
-        <Stack>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-        </Stack>
+        <PaperProvider>
+            <Stack>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+            </Stack>
+        </PaperProvider>
     );
 };
 
