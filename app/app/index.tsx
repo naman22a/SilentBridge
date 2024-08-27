@@ -1,129 +1,73 @@
-import React, { Component, useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  PermissionsAndroid,
-  Button,
-  Platform,
-} from "react-native";
-import AudioRecorderPlayer, {
-  AVEncoderAudioQualityIOSType,
-  AVEncodingOption,
-  AudioEncoderAndroidType,
-  AudioSet,
-  AudioSourceAndroidType,
-} from "react-native-audio-recorder-player";
-class Home extends Component {
-  audioRecorderPlayer: AudioRecorderPlayer;
-  constructor(props: {}) {
-    super(props);
-    this.state = {
-      isLoggingIn: false,
-      recordSecs: 0,
-      recordTime: "00:00:00",
-      currentPositionSec: 0,
-      currentDurationSec: 0,
-      playTime: "00:00:00",
-      duration: "00:00:00",
-    };
-    this.audioRecorderPlayer = new AudioRecorderPlayer();
-    this.audioRecorderPlayer.setSubscriptionDuration(0.09); // optional. Default is 0.1
+import { useState } from "react";
+import { View, StyleSheet, Button } from "react-native";
+import { Audio } from "expo-av";
+
+export default function Home() {
+  const [sound, setSound] = useState();
+  const [uria, setUri] = useState();
+  const [recording, setRecording] = useState();
+  const [permissionResponse, requestPermission] = Audio.usePermissions();
+
+  async function startRecording() {
+    try {
+      if (permissionResponse.status !== "granted") {
+        console.log("Requesting permission..");
+        await requestPermission();
+      }
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      console.log("Starting recording..");
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+      setRecording(recording);
+      console.log("Recording started");
+    } catch (err) {
+      console.error("Failed to start recording", err);
+    }
   }
-  //   const [audioRecorderPlayer, setAudioRecorderPlayer] = useState(
-  //     new AudioRecorderPlayer()
-  //   );
-  //   useEffect(() => {
-  //     async function requestPermission() {
-  //       if (Platform.OS === "android") {
-  //         try {
-  //           const grants = await PermissionsAndroid.requestMultiple([
-  //             PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-  //             PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-  //             PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-  //           ]);
+  async function playSound() {
+    console.log("Loading Sound");
+    const sound = new Audio.Sound();
+    if (uria) {
+      await sound.loadAsync({
+        uri: uria,
+        //   shouldPlay: true,
+      });
+    }
+    await sound.playAsync();
+  }
+  async function stopRecording() {
+    console.log("Stopping recording..");
+    setRecording(undefined);
+    await recording.stopAndUnloadAsync();
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+    });
+    const uri = recording.getURI();
+    setUri(uri);
+    console.log("Recording stopped and stored at", uri);
+  }
 
-  //           console.log("write external storage", grants);
-
-  //           if (
-  //             grants["android.permission.WRITE_EXTERNAL_STORAGE"] ===
-  //               PermissionsAndroid.RESULTS.GRANTED &&
-  //             grants["android.permission.READ_EXTERNAL_STORAGE"] ===
-  //               PermissionsAndroid.RESULTS.GRANTED &&
-  //             grants["android.permission.RECORD_AUDIO"] ===
-  //               PermissionsAndroid.RESULTS.GRANTED
-  //           ) {
-  //             console.log("Permissions granted");
-  //           } else {
-  //             console.log("All required permissions not granted");
-  //             return;
-  //           }
-  //         } catch (err) {
-  //           console.warn(err);
-  //           return;
-  //         }
-  //       }
-  //     }
-  //     requestPermission();
-  //   });
-
-  // render  = () => (
-  //     <Card style={{ flex: 1, flexDirection: 'row', alignItems: 'center', alignContent: 'center', alignSelf: 'center' }}>
-  //       <Background>
-  //         <Logo />
-  //         <Header>InstaPlayer</Header>
-  //         <Title>{this.state.recordTime}</Title>
-  //         <Button mode="contained" icon="record" onPress={() => this.onStartRecord()}>
-  //           RECORD
-  //       </Button>
-  //         <Button
-  //           icon="stop"
-  //           mode="outlined"
-  //           onPress={() => this.onStopRecord()}
-  //         >
-  //           STOP
-  //   </Button>
-  //         <Divider />
-  //         <Title>{this.state.playTime} / {this.state.duration}</Title>
-  //         <Button mode="contained" icon="play" onPress={() => this.onStartPlay()}>
-  //           PLAY
-  //       </Button>
-  //         <Button
-  //           icon="pause"
-  //           mode="contained"
-  //           onPress={() => this.onPausePlay()}
-  //         >
-  //           PAUSE
-  //   </Button>
-  //         <Button
-  //           icon="stop"
-  //           mode="outlined"
-  //           onPress={() => this.onStopPlay()}
-  //         >
-  //           STOP
-  //   </Button>
-  //       </Background>
-  //     </Card>
-  //   )
-  //   return (
-  //     <View style={styles.container}>
-  //       <Button title="start record" onPress={onStartRecord} />
-  //       <Button title="stop record" onPress={onStopRecord} />
-  //       <Button title="pause record" onPress={onPausePlay} />
-  //       <Button title="stop record" onPress={onStopPlay} />
-  //       <Button title="start play" onPress={onStartPlay} />
-  //       <Text>Home Page</Text>
-  //     </View>
-  //   );
+  return (
+    <View style={styles.container}>
+      <Button
+        title={recording ? "Stop Recording" : "Start Recording"}
+        onPress={recording ? stopRecording : startRecording}
+      />
+      <Button title="Play Sound" onPress={() => playSound()} />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    display: "flex",
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "#ecf0f1",
+    padding: 10,
   },
 });
-
-export default Home;
