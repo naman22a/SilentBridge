@@ -15,6 +15,7 @@ Expected Solution: The expected solution entails developing technology-such as s
 1. Development of application by which announcement/ text display in railway platform Display Unit Converted to Indian Sign Language, so that deaf people can see it and understand the announcement.
 2. Development of Mobile app through by which using Mobile Camera, normal person can understand sign language used by deaf individuals.
 
+
 ## 🪶 Features covered
 
 -   🔉 Audio to ISL
