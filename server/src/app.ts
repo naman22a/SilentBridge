@@ -5,7 +5,7 @@ import { homeRoutes } from './routes';
 import { createServer } from 'http';
 import path from 'path';
 import imageToBase64 from 'image-to-base64';
-import { charToImage } from './utils';
+import { charToImage } from './common/utils';
 import { Server } from 'socket.io';
 
 const main = async () => {
