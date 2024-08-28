@@ -10,6 +10,9 @@
 <body>
 
     <button id="btn">Emit Text</button>
+    <br />
+    <br />
+    <img src="" alt="Letter">
 
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
@@ -29,11 +32,12 @@
 
         socket.on('image-stream', ({ image }) => {
             console.log(image);
+            document.querySelector('img').src = `data:image/png;base64,${image}`;
         })
 
         document.getElementById('btn').addEventListener('click', () => {
             console.log('sending text...');
-            socket.emit('text-stream', { text: 'AB' });
+            socket.emit('text-stream', { text: 'I am Naman Arora' });
         })
 
     </script>

@@ -3,13 +3,7 @@ import path from 'path';
 
 export const charToImage = (char: string) => {
     const filename = `${char.toUpperCase()}.jpg`;
-    const filepath = path.join(
-        process.cwd(),
-        'src',
-        'data',
-        'letters',
-        filename
-    );
+    const filepath = path.join(process.cwd(), 'src', 'data', 'ISL', filename);
 
     const exists = fs.existsSync(filepath);
     if (!exists) return '';

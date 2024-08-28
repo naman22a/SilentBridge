@@ -12,6 +12,8 @@ const main = async () => {
     // CONSTANTS
     const app: Application = express();
     const port = process.env.PORT ?? 5000;
+    const server = createServer(app);
+    const io = new Server(server);
 
     // MIDDLEWARE
     app.use(express.json({ limit: '50mb' }));
@@ -23,8 +25,6 @@ const main = async () => {
     app.use('/', homeRoutes);
 
     // WEB SOCKETS
-    const server = createServer(app);
-    const io = new Server(server);
     io.on('connection', (socket) => {
         console.log('Connected', socket.id);
 
