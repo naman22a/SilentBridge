@@ -13,7 +13,7 @@ Background: Indian Sign Language (ISL) is a visual-gestural language used by dea
 Expected Solution: The expected solution entails developing technology-such as software or devices-capable of accurately converting spoken language to Indian Sign Language (ISL). This technology should use speech recognition, natural level processing, and computer vision to transcribe and interpret audio input, generating corresponding ISL gestures in real-time. It should prioritize accuracy, user-friendliness, and adaptibility to regional variation of ISL, thereby facilitating seamless communication between deaf individual and those who do not know sign language. For example:
 
 1. Development of application by which announcement/ text display in railway platform Display Unit Converted to Indian Sign Language, so that deaf people can see it and understand the announcement.
-2. Development of Mobile app through by which using Mobile Camera, normal person can understand sign language used by dead individuals.
+2. Development of Mobile app through by which using Mobile Camera, normal person can understand sign language used by deaf individuals.
 
 ## 🪶 Features covered
 
