@@ -13,7 +13,7 @@ const main = async () => {
     const app: Application = express();
     const port = process.env.PORT ?? 5000;
     const server = createServer(app);
-    const io = new Server(server);
+    const io = new Server(server, { cors: { origin: '*' } });
 
     // MIDDLEWARE
     app.use(express.json({ limit: '50mb' }));
