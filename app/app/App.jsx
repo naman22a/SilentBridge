@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Button } from "react-native";
-import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
-// import {socket, uploadChunksToServer} from './socket';
+// import { socket } from "./socket";
+import { socket, uploadChunksToServer } from "./socket";
 
+import { Audio } from "expo-av";
 export default function App() {
   const [recording, setRecording] = React.useState();
   const [recordings, setRecordings] = React.useState([]);
@@ -17,33 +18,33 @@ export default function App() {
   let sum = 0;
   let p_len = 0;
 
-  //   useEffect(() => {
-  //     if (socket.connected) {
-  //       onConnect();
-  //     }
+  useEffect(() => {
+    if (socket.connected) {
+      onConnect();
+    }
 
-  //     function onConnect() {
-  //       setIsConnected(true);
-  //       setTransport(socket.io.engine.transport.name);
+    function onConnect() {
+      setIsConnected(true);
+      setTransport(socket.io.engine.transport.name);
 
-  //       socket.io.engine.on('upgrade', (transport) => {
-  //         setTransport(transport.name);
-  //       });
-  //     }
+      socket.io.engine.on("upgrade", (transport) => {
+        setTransport(transport.name);
+      });
+    }
 
-  //     function onDisconnect() {
-  //       setIsConnected(false);
-  //       setTransport('N/A');
-  //     }
+    function onDisconnect() {
+      setIsConnected(false);
+      setTransport("N/A");
+    }
 
-  //     socket.on('connect', onConnect);
-  //     socket.on('disconnect', onDisconnect);
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
 
-  //     return () => {
-  //       socket.off('connect', onConnect);
-  //       socket.off('disconnect', onDisconnect);
-  //     };
-  //   }, []);
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+    };
+  }, []);
 
   const convertMP4ToBase64 = async (uri, delay = 0) => {
     try {

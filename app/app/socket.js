@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 import * as FileSystem from "expo-file-system";
 
-export const socket = io("URL"); // use the IP address of your machine
+export const socket = io.connect("http://localhost:5000"); // use the IP address of your machine
 
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -42,7 +42,7 @@ export async function uploadChunksToServer(
           length: chunkSize,
         });
         currentPosition += chunkSize;
-        socket.emit("audioData", fileChunk);
+        socket.emit("audio-stream", { audio: fileChunk });
       }
       prev_pos = currentPosition;
     } catch (e) {
@@ -58,7 +58,7 @@ export async function uploadChunksToServer(
         length: current_file_size - currentPosition,
       });
       currentPosition += current_file_size - currentPosition;
-      socket.emit("audioData", fileChunk);
+      socket.emit("audio-stream", { audio: fileChunk });
       break;
     }
     await sleep(delayBetweenChunks);
