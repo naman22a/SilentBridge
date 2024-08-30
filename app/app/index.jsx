@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Button, Image } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
+import { Button, Icon, MD3Colors } from "react-native-paper";
 // import * as FileSystem from "expo-file-system";
 // import { socket, uploadChunksToServer } from "./socket.js";
 import { Audio } from "expo-av";
@@ -224,9 +225,30 @@ export default function App() {
     setIsRecording((prevState) => !prevState);
   }
 
-  function getRecordingLines() {
-    return recordings.map((recordingLine, index) => {
-      return (
+  function clearRecordings() {
+    setRecordings([]);
+  }
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.heading}>Silent Bridge</Text>
+      <Button
+        mode="contained"
+        onPress={recording ? stopRecording : startRecording}
+      >
+        {!recording ? (
+          <Icon
+            source="record-circle-outline"
+            color={MD3Colors.error99}
+            size={25}
+          />
+        ) : (
+          <Icon source="waveform" color={MD3Colors.error99} size={25} />
+        )}
+      </Button>
+      {image && <Image src={image} alt="ISL" style={styles.image} />}
+
+      {recordings.map((recordingLine, index) => (
         <View key={index} style={styles.row}>
           <Text style={styles.fill}>
             Recording #{index + 1} | {recordingLine.duration}
@@ -237,22 +259,8 @@ export default function App() {
           ></Button>
           <Button title="Send Recording to Backend" />
         </View>
-      );
-    });
-  }
+      ))}
 
-  function clearRecordings() {
-    setRecordings([]);
-  }
-
-  return (
-    <View style={styles.container}>
-      <Button
-        title={recording ? "Stop Recording" : "Start Recording"}
-        onPress={recording ? stopRecording : startRecording}
-      />
-      {image && <Image src={image} alt="ISL" style={styles.image} />}
-      {getRecordingLines()}
       <Button
         title={recordings.length > 0 ? "Clear Recordings" : ""}
         onPress={clearRecordings}
@@ -268,6 +276,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  heading: {
+    fontSize: 50,
+    marginBottom: 30,
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -280,7 +292,9 @@ const styles = StyleSheet.create({
     margin: 15,
   },
   image: {
+    marginTop: 20,
     width: 200,
     height: 200,
+    backgroundColor: "red",
   },
 });
