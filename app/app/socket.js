@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 import * as FileSystem from "expo-file-system";
 
-export const socket = io.connect("http://localhost:5000"); // use the IP address of your machine
+export const socket = io.connect("ws//localhost:5000"); // use the IP address of your machine
 
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
