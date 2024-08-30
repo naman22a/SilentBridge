@@ -9,7 +9,7 @@
 
 <body>
 
-    <button id="btn">Emit Text</button>
+    <button id="btn">Emit Audio</button>
     <br />
     <br />
     <img src="" alt="Letter">
@@ -35,9 +35,14 @@
             document.querySelector('img').src = `data:image/png;base64,${image}`;
         })
 
+        socket.on('image-stream-error', ({ image }) => {
+            console.log(image);
+            alert('Something went wrong');
+        })
+
         document.getElementById('btn').addEventListener('click', () => {
-            console.log('sending text...');
-            socket.emit('text-stream', { text: 'Hello Code' });
+            console.log('sending audio...');
+            socket.emit('audio-stream', { audio: 'base64-audio' });
         })
 
     </script>

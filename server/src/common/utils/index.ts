@@ -10,3 +10,6 @@ export const charToImage = (char: string) => {
 
     return filepath;
 };
+
+export const sleep = async (secs: number) =>
+    new Promise((resolve) => setTimeout(resolve, secs * 1000));
