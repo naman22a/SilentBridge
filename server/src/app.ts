@@ -49,7 +49,7 @@ const main = async () => {
 
         // EVENTS
 
-        // 1. Text to Image
+        // 1. Audio to Images
         socket.on(
             'audio-stream',
             async ({ audio: base64Audio }: { audio: string }) => {
@@ -80,6 +80,7 @@ const main = async () => {
                     // convert audio file to text
                     const text = await audioToText(filePath);
 
+                    // convert text to images
                     for (let char of text) {
                         const imagePath = charToImage(char);
                         if (imagePath) {
