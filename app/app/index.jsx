@@ -6,8 +6,8 @@ import { Audio } from "expo-av";
 import { io } from "socket.io-client";
 import * as FileSystem from "expo-file-system";
 
-export const socket = io("http://localhost:5000"); // use the IP address of your machine
-
+// let socket = io("http://localhost:5000"); // use the IP address of your machine
+const socket = io("http://192.168.0.151:5000", { transports: ["websocket"] });
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -93,6 +93,12 @@ export default function App() {
   useEffect(() => {
     if (socket.connected) {
       onConnect();
+    } else {
+      // socket = io("http://localhost:5000", {
+      //   secure: true,
+      //   transports: ["websocket"],
+      // });
+      console.log(socket.connected);
     }
 
     function onConnect() {
