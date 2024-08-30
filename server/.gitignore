@@ -126,3 +126,11 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# audio
+audio/*.mp3
+audio.json
+audio.srt
+audio.tsv
+audio.txt
+audio.vtt
