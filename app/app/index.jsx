@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Button } from "react-native";
+import { StyleSheet, Text, View, Button, Image } from "react-native";
 // import * as FileSystem from "expo-file-system";
 // import { socket, uploadChunksToServer } from "./socket.js";
 import { Audio } from "expo-av";
@@ -7,7 +7,7 @@ import { io } from "socket.io-client";
 import * as FileSystem from "expo-file-system";
 
 // let socket = io("http://localhost:5000"); // use the IP address of your machine
-const socket = io("http://192.168.0.151:5000", { transports: ["websocket"] });
+const socket = io("http://192.168.0.105:5000", { transports: ["websocket"] });
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -82,6 +82,7 @@ export default function App() {
   const [recordings, setRecordings] = React.useState([]);
   const [sending, setSending] = useState(false);
   const [recordingBackLog, setRecordingBackLog] = useState([]);
+  const [image, setImage] = useState("");
 
   const [isRecording, setIsRecording] = React.useState(false);
   const [prevLen, setPrevLen] = useState(0);
@@ -115,8 +116,16 @@ export default function App() {
       setTransport("N/A");
     }
 
+    function handleImageStream(data) {
+      // data -> { image: "base64-string" }
+      const base64Image = data.image;
+      const imageUri = `data:image/png;base64,${base64Image}`;
+      setImage(imageUri);
+    }
+
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
+    socket.on("image-stream", handleImageStream);
 
     return () => {
       socket.off("connect", onConnect);
@@ -242,6 +251,7 @@ export default function App() {
         title={recording ? "Stop Recording" : "Start Recording"}
         onPress={recording ? stopRecording : startRecording}
       />
+      {image && <Image src={image} alt="ISL" style={styles.image} />}
       {getRecordingLines()}
       <Button
         title={recordings.length > 0 ? "Clear Recordings" : ""}
@@ -268,5 +278,9 @@ const styles = StyleSheet.create({
   fill: {
     flex: 1,
     margin: 15,
+  },
+  image: {
+    width: 200,
+    height: 200,
   },
 });

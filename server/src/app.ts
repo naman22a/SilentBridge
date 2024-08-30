@@ -7,20 +7,26 @@ import path from 'path';
 import imageToBase64 from 'image-to-base64';
 import { charToImage } from './common/utils';
 import { Server } from 'socket.io';
-import OpenAI from 'openai';
 import fs from 'fs';
 import { sleep } from './common/utils';
+import { exec } from 'child_process';
 
-const openai = new OpenAI({
-    apiKey: process.env.OPEN_AI_SECRET_KEY
-});
+async function audioToText(audioFilePath: string) {
+    return new Promise<string>((resolve) => {
+        const command = `whisper "${audioFilePath}" --model tiny --language English`;
 
-async function audioToText(filePath: string) {
-    const transcription = await openai.audio.transcriptions.create({
-        file: fs.createReadStream(filePath),
-        model: 'whisper-1'
+        exec(command, { timeout: 10000000 }, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error: ${error.message}`);
+                return resolve('');
+            }
+            if (stderr) {
+                console.error(`Stderr: ${stderr}`);
+                return resolve('');
+            }
+            return resolve(stdout);
+        });
     });
-    return transcription.text;
 }
 
 const main = async () => {
@@ -56,10 +62,9 @@ const main = async () => {
                 try {
                     // convert base64 audio to audio file on disk
                     const filePath = path.join(
-                        __dirname,
-                        '..',
+                        process.cwd(),
                         'audio',
-                        'audo.mp3'
+                        'audio.mp3'
                     );
                     const base64Data = base64Audio.replace(
                         /^data:audio\/\w+;base64,/,
@@ -78,7 +83,11 @@ const main = async () => {
                     );
 
                     // convert audio file to text
-                    const text = await audioToText(filePath);
+                    await audioToText(filePath);
+                    const text = fs
+                        .readFileSync(path.join(process.cwd(), 'audio.txt'))
+                        .toString();
+                    console.log(text);
 
                     // convert text to images
                     for (let char of text) {
