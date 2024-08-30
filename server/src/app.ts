@@ -7,6 +7,21 @@ import path from 'path';
 import imageToBase64 from 'image-to-base64';
 import { charToImage } from './common/utils';
 import { Server } from 'socket.io';
+import OpenAI from 'openai';
+import fs from 'fs';
+import { sleep } from './common/utils';
+
+const openai = new OpenAI({
+    apiKey: process.env.OPEN_AI_SECRET_KEY
+});
+
+async function audioToText(filePath: string) {
+    const transcription = await openai.audio.transcriptions.create({
+        file: fs.createReadStream(filePath),
+        model: 'whisper-1'
+    });
+    return transcription.text;
+}
 
 const main = async () => {
     // CONSTANTS
@@ -35,27 +50,50 @@ const main = async () => {
         // EVENTS
 
         // 1. Text to Image
-        socket.on('text-stream', ({ text }: { text: string }) => {
-            let index = 0;
-
-            const intervalId = setInterval(async () => {
-                if (index >= text.length) {
-                    clearInterval(intervalId);
-                    return;
-                }
-
-                const char = text[index];
-
+        socket.on(
+            'audio-stream',
+            async ({ audio: base64Audio }: { audio: string }) => {
                 try {
-                    const base64 = await imageToBase64(charToImage(char));
-                    socket.emit('image-stream', { image: base64 });
+                    // convert base64 audio to audio file on disk
+                    const filePath = path.join(
+                        __dirname,
+                        '..',
+                        'audio',
+                        'audo.mp3'
+                    );
+                    const base64Data = base64Audio.replace(
+                        /^data:audio\/\w+;base64,/,
+                        ''
+                    );
+                    const audioBuffer = Buffer.from(base64Data, 'base64');
+
+                    await new Promise((resolve, reject) =>
+                        fs.writeFile(filePath, audioBuffer, (err) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve(filePath);
+                            }
+                        })
+                    );
+
+                    // convert audio file to text
+                    const text = await audioToText(filePath);
+
+                    for (let char of text) {
+                        const imagePath = charToImage(char);
+                        if (imagePath) {
+                            const base64 = await imageToBase64(imagePath);
+                            socket.emit('image-stream', { image: base64 });
+                            await sleep(2); // 2 secs
+                        }
+                    }
                 } catch (error) {
+                    socket.emit('image-stream-error', { image: '' });
                     console.error(error);
                 }
-
-                index++;
-            }, 2000); // 2 seconds
-        });
+            }
+        );
     });
 
     // STARTING THE SERVER
