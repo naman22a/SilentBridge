@@ -15,7 +15,6 @@ Expected Solution: The expected solution entails developing technology-such as s
 1. Development of application by which announcement/ text display in railway platform Display Unit Converted to Indian Sign Language, so that deaf people can see it and understand the announcement.
 2. Development of Mobile app through by which using Mobile Camera, normal person can understand sign language used by deaf individuals.
 
-
 ## 🪶 Features covered
 
 -   🔉 Audio to ISL
@@ -40,3 +39,11 @@ Expected Solution: The expected solution entails developing technology-such as s
     -   🚩 Keras
     -   🍊 Tensorflow
     -   🌄 CNN (convolutional neural network)
+
+## 🚶🏻‍♂️ Getting started and 🏃🏻‍♂️ Running the app
+
+Detailed instructions for setting up each part of this application is given in their respective README.md files:
+
+-   📱 App: [README.md](./app/README.md)
+-   🪹 Server: [README.md](./server/README.md)
+-   🤖 AI Model: [README.md](./model/README.md)
