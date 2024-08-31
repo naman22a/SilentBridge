@@ -94,12 +94,15 @@ const main = async () => {
                         const imagePath = charToImage(char);
                         if (imagePath) {
                             const base64 = await imageToBase64(imagePath);
-                            socket.emit('image-stream', { image: base64 });
+                            socket.emit('image-stream', {
+                                image: base64,
+                                text
+                            });
                             await sleep(2); // 2 secs
                         }
                     }
                 } catch (error) {
-                    socket.emit('image-stream-error', { image: '' });
+                    socket.emit('image-stream-error', { image: '', text: '' });
                     console.error(error);
                 }
             }
