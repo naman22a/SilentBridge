@@ -2,6 +2,9 @@ import fs from 'fs';
 import path from 'path';
 
 export const charToImage = (char: string) => {
+    if (char == ' ')
+        return path.join(process.cwd(), 'src', 'data', 'ISL', 'space.png');
+
     const filename = `${char.toUpperCase()}.jpg`;
     const filepath = path.join(process.cwd(), 'src', 'data', 'ISL', filename);
 
