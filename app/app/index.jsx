@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Image } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { StyleSheet, Text, View, Image, ScrollView } from "react-native";
 import { Button, Icon, MD3Colors } from "react-native-paper";
 // import * as FileSystem from "expo-file-system";
 // import { socket, uploadChunksToServer } from "./socket.js";
@@ -8,7 +8,7 @@ import { io } from "socket.io-client";
 import * as FileSystem from "expo-file-system";
 
 // let socket = io("http://localhost:5000"); // use the IP address of your machine
-const socket = io("http://192.168.0.105:5000", { transports: ["websocket"] });
+const socket = io("http://192.168.0.151:5000", { transports: ["websocket"] });
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -79,11 +79,12 @@ export async function uploadChunksToServer(
 }
 
 export default function App() {
+  const scrollViewRef = useRef();
   const [recording, setRecording] = React.useState();
   const [recordings, setRecordings] = React.useState([]);
   const [sending, setSending] = useState(false);
   const [recordingBackLog, setRecordingBackLog] = useState([]);
-  const [image, setImage] = useState("");
+  const [islImage, setIslImage] = useState([]);
 
   const [isRecording, setIsRecording] = React.useState(false);
   const [prevLen, setPrevLen] = useState(0);
@@ -96,10 +97,6 @@ export default function App() {
     if (socket.connected) {
       onConnect();
     } else {
-      // socket = io("http://localhost:5000", {
-      //   secure: true,
-      //   transports: ["websocket"],
-      // });
       console.log(socket.connected);
     }
 
@@ -117,23 +114,30 @@ export default function App() {
       setTransport("N/A");
     }
 
-    function handleImageStream(data) {
-      // data -> { image: "base64-string" }
-      const base64Image = data.image;
-      const imageUri = `data:image/png;base64,${base64Image}`;
-      setImage(imageUri);
-    }
-
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
-    socket.on("image-stream", handleImageStream);
 
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
     };
   }, []);
-
+  useEffect(() => {
+    socket.on("image-stream", (data) => {
+      const base64Image = data.image;
+      const imageUri = `data:image/png;base64,${base64Image}`;
+      setIslImage((old) => [...old, imageUri]);
+    });
+    return () => {
+      // socket.off("image-stream", handleImageStream);
+    };
+  }, [socket]);
+  function handleImageStream(data) {
+    // data -> { image: "base64-string" }
+    const base64Image = data.image;
+    const imageUri = `data:image/png;base64,${base64Image}`;
+    setIslImage([...islImage, imageUri]);
+  }
   const convertMP4ToBase64 = async (uri, delay = 0) => {
     try {
       // Read the file
@@ -246,7 +250,29 @@ export default function App() {
           <Icon source="waveform" color={MD3Colors.error99} size={25} />
         )}
       </Button>
-      {image && <Image src={image} alt="ISL" style={styles.image} />}
+      <View style={styles.scrollContainer}>
+        <ScrollView
+          horizontal={true}
+          style={styles.slide}
+          ref={scrollViewRef}
+          onContentSizeChange={() =>
+            scrollViewRef.current.scrollToEnd({ animated: true })
+          }
+        >
+          {islImage &&
+            islImage.map((imaged) => {
+              // console.log(islImage.length);
+              return (
+                <Image
+                  key={imaged}
+                  src={imaged}
+                  alt="ISL"
+                  style={styles.image}
+                />
+              );
+            })}
+        </ScrollView>
+      </View>
 
       {recordings.map((recordingLine, index) => (
         <View key={index} style={styles.row}>
@@ -254,17 +280,22 @@ export default function App() {
             Recording #{index + 1} | {recordingLine.duration}
           </Text>
           <Button
+            mode="contained"
             onPress={() => recordingLine.sound.replayAsync()}
-            title="Play"
-          ></Button>
-          <Button title="Send Recording to Backend" />
+          >
+            Play
+          </Button>
         </View>
       ))}
-
-      <Button
-        title={recordings.length > 0 ? "Clear Recordings" : ""}
-        onPress={clearRecordings}
-      />
+      {recordings.length > 0 && (
+        <Button
+          style={styles.clearBTN}
+          onPress={clearRecordings}
+          mode="outlined"
+        >
+          Clear Recordings
+        </Button>
+      )}
     </View>
   );
 }
@@ -274,15 +305,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
+    backgroundColor: "#f0f0f0",
     justifyContent: "center",
   },
   heading: {
     fontSize: 50,
     marginBottom: 30,
+    // backgroundColor: "red",
+  },
+  clearBTN: {
+    marginTop: 20,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#green",
     justifyContent: "center",
     marginLeft: 10,
     marginRight: 40,
@@ -291,10 +328,25 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 15,
   },
+  scrollContainer: {
+    height: 200,
+    alignContent: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    justifyItems: "center",
+    marginVertical: 20,
+    width: "90%",
+  },
+  slide: {
+    // flex: 0.3,
+    height: 20,
+  },
   image: {
     marginTop: 20,
+    // flex: 1,
     width: 200,
     height: 200,
+    margin: 10,
     backgroundColor: "red",
   },
 });
