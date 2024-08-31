@@ -8,7 +8,7 @@ import { io } from "socket.io-client";
 import * as FileSystem from "expo-file-system";
 
 // let socket = io("http://localhost:5000"); // use the IP address of your machine
-const socket = io("http://192.168.0.151:5000", { transports: ["websocket"] });
+const socket = io("http://192.168.0.105:5000", { transports: ["websocket"] });
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -85,6 +85,7 @@ export default function App() {
   const [sending, setSending] = useState(false);
   const [recordingBackLog, setRecordingBackLog] = useState([]);
   const [islImage, setIslImage] = useState([]);
+  const [text, setText] = useState("");
 
   const [isRecording, setIsRecording] = React.useState(false);
   const [prevLen, setPrevLen] = useState(0);
@@ -125,6 +126,7 @@ export default function App() {
   useEffect(() => {
     socket.on("image-stream", (data) => {
       const base64Image = data.image;
+      setText(data.text);
       const imageUri = `data:image/png;base64,${base64Image}`;
       setIslImage((old) => [...old, imageUri]);
     });
@@ -273,6 +275,12 @@ export default function App() {
             })}
         </ScrollView>
       </View>
+
+      {text && (
+        <View>
+          <Text style={{ fontSize: 18 }}>{text}</Text>
+        </View>
+      )}
 
       {recordings.map((recordingLine, index) => (
         <View key={index} style={styles.row}>
