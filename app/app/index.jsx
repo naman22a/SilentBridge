@@ -6,6 +6,7 @@ import { Button, Icon, MD3Colors } from "react-native-paper";
 import { Audio } from "expo-av";
 import { io } from "socket.io-client";
 import * as FileSystem from "expo-file-system";
+import { Link } from "expo-router";
 
 // let socket = io("http://localhost:5000"); // use the IP address of your machine
 const socket = io("http://192.168.0.105:5000", { transports: ["websocket"] });
@@ -240,6 +241,9 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Silent Bridge</Text>
+      <Link href="/ISL" style={{ marginBottom: 10 }}>
+        <Button mode="contained">Switch to ISL to Audio</Button>
+      </Link>
       <Button
         mode="contained"
         onPress={recording ? stopRecording : startRecording}
