@@ -125,6 +125,7 @@ export default function App() {
   }, []);
   useEffect(() => {
     socket.on("image-stream", (data) => {
+      setSending(false);
       const base64Image = data.image;
       setText(data.text);
       const imageUri = `data:image/png;base64,${base64Image}`;
@@ -199,6 +200,7 @@ export default function App() {
   }
 
   async function stopRecording() {
+    setSending(true);
     setPrevLen(0);
     try {
       if (!recording) return;
@@ -252,7 +254,10 @@ export default function App() {
           <Icon source="waveform" color={MD3Colors.error99} size={25} />
         )}
       </Button>
+
       <View style={styles.scrollContainer}>
+        {sending && <Text>Loading...</Text>}
+
         <ScrollView
           horizontal={true}
           style={styles.slide}
@@ -262,11 +267,11 @@ export default function App() {
           }
         >
           {islImage &&
-            islImage.map((imaged) => {
+            islImage.map((imaged, index) => {
               // console.log(islImage.length);
               return (
                 <Image
-                  key={imaged}
+                  key={index}
                   src={imaged}
                   alt="ISL"
                   style={styles.image}
