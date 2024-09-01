@@ -8,6 +8,7 @@ import { Button, Icon, MD3Colors } from "react-native-paper";
 import { Audio } from "expo-av";
 import { io } from "socket.io-client";
 import * as FileSystem from "expo-file-system";
+import { Link } from "expo-router";
 
 // let socket = io("http://localhost:5000"); // use the IP address of your machine
 const socket = io("http://192.168.0.151:5000", { transports: ["websocket"] });
@@ -128,6 +129,7 @@ export default function App() {
   }, []);
   useEffect(() => {
     socket.on("image-stream", (data) => {
+      setSending(false);
       const base64Image = data.image;
       setText(data.text);
       const imageUri = `data:image/png;base64,${base64Image}`;
@@ -202,6 +204,7 @@ export default function App() {
   }
 
   async function stopRecording() {
+    setSending(true);
     setPrevLen(0);
     try {
       if (!recording) return;
@@ -241,6 +244,9 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Silent Bridge</Text>
+      <Link href="/ISL" style={{ marginBottom: 10 }}>
+        <Button mode="contained">Switch to ISL to Audio</Button>
+      </Link>
       <Button
         mode="contained"
         onPress={recording ? stopRecording : startRecording}
@@ -255,7 +261,10 @@ export default function App() {
           <Icon source="waveform" color={MD3Colors.error99} size={25} />
         )}
       </Button>
+
       <View style={styles.scrollContainer}>
+        {sending && <Text>Loading...</Text>}
+
         <ScrollView
           horizontal={true}
           style={styles.slide}
@@ -265,11 +274,11 @@ export default function App() {
           }
         >
           {islImage &&
-            islImage.map((imaged) => {
+            islImage.map((imaged, index) => {
               // console.log(islImage.length);
               return (
                 <Image
-                  key={imaged}
+                  key={index}
                   src={imaged}
                   alt="ISL"
                   style={styles.image}
