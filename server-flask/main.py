@@ -83,6 +83,11 @@ def post_prediction():
 
         # Resize image to 100x100 dimensions
         resized_image = tf.image.resize(tf_image, [100, 100])
+
+        # Normalize the image (values will be between 0 and 1)
+        resized_image = resized_image / 255.0
+
+        # Add batch dimension
         resized_image = tf.expand_dims(resized_image, 0)
 
         # Predict the value
