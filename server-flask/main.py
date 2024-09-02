@@ -68,46 +68,43 @@ def post_prediction():
                 "data": None,
                 "errors": [{"field": "image", "message": "Please upload an image"}]
             })
+        
+        image = request.files['image']
+        filename = secure_filename(image.filename)
+        image_path = os.path.join('tmp', filename)
+        image.save(image_path)
+
+        # Check if model does not exist
+        if model is None:
+            raise Exception('Model not loaded yet')
+
+        # Convert image into tensor image
+        tf_image = tf.image.decode_image(tf.io.read_file(image_path))
+
+        # Resize image to 100x100 dimensions
+        resized_image = tf.image.resize(tf_image, [100, 100])
+
+        # Normalize the image (values will be between 0 and 1)
+        resized_image = resized_image / 255.0
+
+        # Add batch dimension
+        resized_image = tf.expand_dims(resized_image, 0)
+
+        # Predict the value
+        output = model.predict(resized_image)
+
+        # Convert tensor to list
+        indices = output.tolist()[0]
+
+        # Find the highest probability and index
+        max_index = np.argmax(indices)
+
+        # Get the character from labels array by passing the index
+        character = labels[max_index]
+
         return jsonify({
-                "data": "None",
-                "errors": [{"field": "image", "message": "Please upload an image"}]
-            })
-        # image = request.files['image']
-        # filename = secure_filename(image.filename)
-        # image_path = os.path.join('tmp', filename)
-        # image.save(image_path)
-
-        # # Check if model does not exist
-        # if model is None:
-        #     raise Exception('Model not loaded yet')
-
-        # # Convert image into tensor image
-        # tf_image = tf.image.decode_image(tf.io.read_file(image_path))
-
-        # # Resize image to 100x100 dimensions
-        # resized_image = tf.image.resize(tf_image, [100, 100])
-
-        # # Normalize the image (values will be between 0 and 1)
-        # resized_image = resized_image / 255.0
-
-        # # Add batch dimension
-        # resized_image = tf.expand_dims(resized_image, 0)
-
-        # # Predict the value
-        # output = model.predict(resized_image)
-
-        # # Convert tensor to list
-        # indices = output.tolist()[0]
-
-        # # Find the highest probability and index
-        # max_index = np.argmax(indices)
-
-        # # Get the character from labels array by passing the index
-        # character = labels[max_index]
-
-        # return jsonify({
-        #     "data": { "character": character }
-        # })
+            "data": { "character": character }
+        })
     except Exception as error:
         print(error)
         return jsonify({
