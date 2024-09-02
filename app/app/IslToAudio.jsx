@@ -3,7 +3,6 @@ import React from "react";
 import { Button } from "react-native-paper";
 import imagePicker from "react-native-image-picker";
 import * as ImagePicker from "expo-image-picker";
-
 const options2 = {
   title: "Select video",
   mediaType: "video",
@@ -87,6 +86,7 @@ const IslToAudio = () => {
   // }, []);
   return (
     <View style={styles.container}>
+      <Text style={styles.heading}>Silent Bridge</Text>
       <Button
         mode="contained"
         small
@@ -95,7 +95,7 @@ const IslToAudio = () => {
           pickImage();
         }}
       >
-        Select Photo
+        Select
       </Button>
     </View>
   );
@@ -109,6 +109,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     backgroundColor: "#f0f0f0",
+    paddingBottom: 200,
     justifyContent: "center",
+  },
+  heading: {
+    fontSize: 50,
+    marginBottom: 30,
   },
 });
