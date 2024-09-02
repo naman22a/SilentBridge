@@ -8,7 +8,7 @@ import { io } from "socket.io-client";
 import * as FileSystem from "expo-file-system";
 
 // let socket = io("http://localhost:5000"); // use the IP address of your machine
-const socket = io("http://192.168.0.151:5000", { transports: ["websocket"] });
+const socket = io("http://10.10.35.178:5000", { transports: ["websocket"] });
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -42,13 +42,15 @@ export async function uploadChunksToServer(
         continue;
       } else {
         console.log(currentPosition, current_file_size);
-        const fileChunk = await FileSystem.readAsStringAsync(uri, {
-          encoding: FileSystem.EncodingType.Base64,
-          position: currentPosition,
-          length: chunkSize,
-        });
-        currentPosition += chunkSize;
-        socket.emit("audio-stream", { audio: fileChunk });
+        try {
+          const fileChunk = await FileSystem.readAsStringAsync(uri, {
+            encoding: FileSystem.EncodingType.Base64,
+            position: currentPosition,
+            length: chunkSize,
+          });
+          currentPosition += chunkSize;
+          socket.emit("audio-stream", { audio: fileChunk });
+        } catch (error) {}
       }
       prev_pos = currentPosition;
     } catch (e) {
