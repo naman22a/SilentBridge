@@ -8,11 +8,15 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Silent Bridge</Text>
-      <Link href="/IslToAudio" style={{ marginBottom: 10 }}>
-        <Button mode="contained">Switch to ISL to Audio</Button>
+      <Link href="/IslToAudio" style={{ marginBottom: 15 }}>
+        <Button mode="outlined">
+          <Text style={styles.BtnText}>ISL to Audio</Text>
+        </Button>
       </Link>
-      <Link href="/AudioToIsl" style={{ marginBottom: 10 }}>
-        <Button mode="contained">Switch to Audio to ISL</Button>
+      <Link href="/AudioToIsl" style={{ marginBottom: 15 }}>
+        <Button mode="outlined">
+          <Text style={styles.BtnText}>Audio to ISL</Text>
+        </Button>
       </Link>
       {/* <AudioToIsl /> */}
     </View>
@@ -20,6 +24,11 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  BtnText: {
+    color: "blue",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",

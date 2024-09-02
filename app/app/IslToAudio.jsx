@@ -14,6 +14,7 @@ const IslToAudio = () => {
   // }, []);
   return (
     <View style={styles.container}>
+      <Text style={styles.heading}>Silent Bridge</Text>
       <Button
         mode="contained"
         small
@@ -22,7 +23,7 @@ const IslToAudio = () => {
           pickImage();
         }}
       >
-        Select Video
+        Select
       </Button>
     </View>
   );
@@ -109,6 +110,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     backgroundColor: "#f0f0f0",
+    paddingBottom: 200,
     justifyContent: "center",
+  },
+  heading: {
+    fontSize: 50,
+    marginBottom: 30,
   },
 });
