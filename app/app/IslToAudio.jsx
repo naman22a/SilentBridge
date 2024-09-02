@@ -3,30 +3,7 @@ import React from "react";
 import { Button } from "react-native-paper";
 import imagePicker from "react-native-image-picker";
 import * as ImagePicker from "expo-image-picker";
-// import {
-//   FFmpegKit,
-//   FFmpegKitConfig,
-//   ReturnCode,
-// } from "ffmpeg-kit-react-native";
-const IslToAudio = () => {
-  // React.useEffect(() => {
-  //   FFmpegKitConfig.init();
-  // }, []);
-  return (
-    <View style={styles.container}>
-      <Button
-        mode="contained"
-        small
-        primary
-        onPress={() => {
-          pickImage();
-        }}
-      >
-        Select Video
-      </Button>
-    </View>
-  );
-};
+
 const options2 = {
   title: "Select video",
   mediaType: "video",
@@ -45,6 +22,7 @@ const pickImage = async () => {
 
   if (!result.canceled) {
     // selectVideo(result.assets[0].uri);
+    console.log(result.assets[0].uri);
     postImage(result.assets[0].uri);
   }
 };
@@ -56,13 +34,9 @@ const postImage = async (data) => {
     body: JSON.stringify({ image: data }),
   };
   try {
-    await fetch("http://192.168.0.151:8080/predict", requestOptions).then(
-      (response) => {
-        response.json().then((data) => {
-          console.log("data : ", data);
-        });
-      }
-    );
+    const res = await fetch("http://10.10.35.178:8080/predict", requestOptions);
+    const data = await res.json();
+    console.log(data);
   } catch (error) {
     console.error(error);
   }
@@ -101,6 +75,32 @@ const postImage = async (data) => {
 //     }
 //   });
 // }
+
+// import {
+//   FFmpegKit,
+//   FFmpegKitConfig,
+//   ReturnCode,
+// } from "ffmpeg-kit-react-native";
+const IslToAudio = () => {
+  // React.useEffect(() => {
+  //   FFmpegKitConfig.init();
+  // }, []);
+  return (
+    <View style={styles.container}>
+      <Button
+        mode="contained"
+        small
+        primary
+        onPress={() => {
+          pickImage();
+        }}
+      >
+        Select Photo
+      </Button>
+    </View>
+  );
+};
+
 export default IslToAudio;
 
 const styles = StyleSheet.create({
