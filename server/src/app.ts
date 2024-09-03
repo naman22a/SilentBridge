@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express, { Application } from 'express';
 import cors from 'cors';
-import { homeRoutes } from './routes';
+import { homeRoutes, pRoutes } from './routes';
 import { createServer } from 'http';
 import path from 'path';
 import imageToBase64 from 'image-to-base64';
@@ -44,6 +44,7 @@ const main = async () => {
 
     // ROUTES
     app.use('/', homeRoutes);
+    app.use('/p', pRoutes);
 
     // WEB SOCKETS
     io.on('connection', (socket) => {

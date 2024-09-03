@@ -6,9 +6,10 @@ import { Button, Icon, MD3Colors } from "react-native-paper";
 import { Audio } from "expo-av";
 import { io } from "socket.io-client";
 import * as FileSystem from "expo-file-system";
+import { API_ENDPOINT } from "../constants";
 
 // let socket = io("http://localhost:5000"); // use the IP address of your machine
-const socket = io("http://10.10.35.178:5000", { transports: ["websocket"] });
+const socket = io(`http://${API_ENDPOINT}:5000`, { transports: ["websocket"] });
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -60,24 +61,28 @@ export async function uploadChunksToServer(
       recordingInstance._isDoneRecording &&
       current_file_size - currentPosition < chunkSize
     ) {
-      const fileChunk = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64,
-        position: currentPosition,
-        length: current_file_size - currentPosition,
-      });
-      currentPosition += current_file_size - currentPosition;
-      socket.emit("audio-stream", { audio: fileChunk });
-      break;
+      try {
+        const fileChunk = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64,
+          position: currentPosition,
+          length: current_file_size - currentPosition,
+        });
+        currentPosition += current_file_size - currentPosition;
+        socket.emit("audio-stream", { audio: fileChunk });
+        break;
+      } catch (error) {}
     }
     await sleep(delayBetweenChunks);
   } while (currentPosition < current_file_size);
   console.log("final report >> ", currentPosition, current_file_size);
   console.log("exiting");
 
-  const fileChunk = await FileSystem.readAsStringAsync(uri, {
-    encoding: FileSystem.EncodingType.Base64,
-  });
-  socket.emit("data", fileChunk);
+  try {
+    const fileChunk = await FileSystem.readAsStringAsync(uri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    socket.emit("data", fileChunk);
+  } catch (error) {}
 }
 
 export default function AudioToIsl() {
@@ -233,6 +238,9 @@ export default function AudioToIsl() {
 
   function clearRecordings() {
     setRecordings([]);
+    setText("");
+    setIslImage([]);
+    socket.off("image-stream");
   }
 
   return (

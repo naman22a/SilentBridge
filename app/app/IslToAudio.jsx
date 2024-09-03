@@ -1,44 +1,14 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import { StyleSheet, Text, View, Image } from "react-native";
+import React, { useState } from "react";
 import { Button } from "react-native-paper";
 import imagePicker from "react-native-image-picker";
 import * as ImagePicker from "expo-image-picker";
+import { API_ENDPOINT } from "../constants";
 const options2 = {
   title: "Select video",
   mediaType: "video",
   path: "video",
   quality: 1,
-};
-
-const pickImage = async () => {
-  // No permissions request is necessary for launching the image library
-  let result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsEditing: true,
-    aspect: [4, 3],
-    quality: 1,
-  });
-
-  if (!result.canceled) {
-    // selectVideo(result.assets[0].uri);
-    console.log(result.assets[0].uri);
-    postImage(result.assets[0].uri);
-  }
-};
-
-const postImage = async (data) => {
-  const requestOptions = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ image: data }),
-  };
-  try {
-    const res = await fetch("http://10.10.35.178:8080/predict", requestOptions);
-    const data = await res.json();
-    console.log(data);
-  } catch (error) {
-    console.error(error);
-  }
 };
 
 // async function selectVideo(data) {
@@ -81,6 +51,43 @@ const postImage = async (data) => {
 //   ReturnCode,
 // } from "ffmpeg-kit-react-native";
 const IslToAudio = () => {
+  const [char, setChar] = useState("");
+  const [uri, setUri] = useState("");
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      console.log(result.assets[0].uri);
+      setUri(result.assets[0].uri);
+      postImage(result.assets[0].uri);
+    }
+  };
+
+  const postImage = async (data) => {
+    const formData = new FormData();
+    formData.append("image", {
+      uri: data,
+      name: "photo.jpg",
+      type: "image/jpeg",
+    });
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "multipart/form-data" },
+      body: formData,
+    };
+    try {
+      const res = await fetch(`http://${API_ENDPOINT}:5000/p`, requestOptions);
+      const data = await res.json();
+      console.log(data.data.character);
+      setChar(data.data.character);
+    } catch (error) {}
+  };
   // React.useEffect(() => {
   //   FFmpegKitConfig.init();
   // }, []);
@@ -95,8 +102,12 @@ const IslToAudio = () => {
           pickImage();
         }}
       >
-        Select
+        Select Image from Gallery
       </Button>
+      {uri && <Image src={uri} />}
+      {char && (
+        <Text style={{ marginTop: 30, fontSize: 20 }}>Character: {char} </Text>
+      )}
     </View>
   );
 };

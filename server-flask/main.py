@@ -68,7 +68,7 @@ def post_prediction():
                 "data": None,
                 "errors": [{"field": "image", "message": "Please upload an image"}]
             })
-        
+        print("Hellooooooooooooooooooooooooooooooooooooo")
         image = request.files['image']
         filename = secure_filename(image.filename)
         image_path = os.path.join('tmp', filename)
