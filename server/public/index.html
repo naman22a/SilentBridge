@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <button id="btn">Emit Audio</button>
+    <br />
+    <br />
+    <img src="" alt="Letter">
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+
+        const socket = io('http://localhost:5000');
+        socket.on('connect', () => {
+            console.log('Connected:', socket.id);
+        });
+        socket.on('disconnect', () => {
+            console.log('Disconnected');
+        });
+        socket.on('connect_error', (err) => {
+            console.error('Connection error:', err);
+        });
+
+        // EVENTS
+
+        socket.on('image-stream', ({ image }) => {
+            console.log(image);
+            document.querySelector('img').src = `data:image/png;base64,${image}`;
+        })
+
+        socket.on('image-stream-error', ({ image }) => {
+            console.log(image);
+            alert('Something went wrong');
+        })
+
+        document.getElementById('btn').addEventListener('click', () => {
+            console.log('sending audio...');
+            socket.emit('audio-stream', { audio: 'base64-audio' });
+        })
+
+    </script>
+</body>
+
+</html>
